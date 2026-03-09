@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday ❤️</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --rose:      #c8445a;
+    --blush:     #f7cfd6;
+    --cream:     #fdf6f0;
+    --gold:      #d4a754;
+    --dark:      #2a1a1f;
+    --soft:      #7a4f5a;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Lato', sans-serif;
+    background: var(--cream);
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* ── Custom cursor ── */
+  #cursor {
+    position: fixed;
+    width: 10px; height: 10px;
+    background: var(--rose);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform .15s ease, background .3s;
+    mix-blend-mode: multiply;
+  }
+
+  /* ── Floating petals ── */
+  .petal {
+    position: fixed;
+    pointer-events: none;
+    z-index: 0;
+    animation: drift linear infinite;
+    opacity: 0;
+    font-size: 14px;
+  }
+  @keyframes drift {
+    0%   { transform: translateY(110vh) rotate(0deg);   opacity: .7; }
+    100% { transform: translateY(-10vh) rotate(540deg); opacity: 0;  }
+  }
+
+  /* ── Trail hearts ── */
+  .trail {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    font-size: 12px;
+    animation: trailFade .9s forwards;
+  }
+  @keyframes trailFade {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to   { opacity: 0; transform: translateY(-30px) scale(1.8); }
+  }
+
+  /* ── Page wrapper ── */
+  #page {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 20px 80px;
+  }
+
+  /* ── Decorative rule ── */
+  .ornament {
+    color: var(--gold);
+    letter-spacing: 8px;
+    font-size: 13px;
+    opacity: .7;
+    margin-bottom: 12px;
+  }
+
+  /* ── Title ── */
+  .title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(52px, 9vw, 90px);
+    color: var(--rose);
+    line-height: 1.05;
+    letter-spacing: 2px;
+    text-align: center;
+    animation: fadeDown .9s ease both;
+  }
+  .title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(16px, 3vw, 22px);
+    font-style: italic;
+    color: var(--soft);
+    margin-top: 6px;
+    animation: fadeDown 1.1s ease both;
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Divider ── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 28px 0;
+    width: min(480px, 90%);
+    animation: fadeIn 1.4s ease both;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+  }
+  .divider span { color: var(--gold); font-size: 18px; }
+
+  /* ── Letter card ── */
+  .letter-wrap {
+    width: min(680px, 90%);
+    animation: fadeIn 1.6s ease both;
+  }
+
+  .letter-card {
+    background: white;
+    border-radius: 4px;
+    padding: 44px 50px;
+    box-shadow:
+      0 2px 4px rgba(200,68,90,.06),
+      0 8px 32px rgba(200,68,90,.10),
+      0 0 0 1px rgba(212,167,84,.18);
+    position: relative;
+    overflow: hidden;
+  }
+  .letter-card::before {
+    content: '❤';
+    position: absolute;
+    top: -30px; right: -20px;
+    font-size: 180px;
+    color: var(--blush);
+    opacity: .35;
+    pointer-events: none;
+    line-height: 1;
+  }
+
+  .letter-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(17px, 2.2vw, 20px);
+    line-height: 1.85;
+    color: var(--dark);
+    font-weight: 300;
+    position: relative;
+  }
+  .letter-text .drop-cap {
+    float: left;
+    font-size: 4.5em;
+    line-height: .75;
+    margin: .04em .1em -.04em 0;
+    color: var(--rose);
+    font-style: italic;
+  }
+
+  /* collapsed / expanded letter */
+  .letter-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 1.2s cubic-bezier(.4,0,.2,1), opacity .8s ease;
+    opacity: 0;
+  }
+  .letter-body.open {
+    max-height: 600px;
+    opacity: 1;
+  }
+
+  .letter-preview {
+    transition: opacity .5s ease;
+  }
+  .letter-preview.hide {
+    opacity: 0;
+    pointer-events: none;
+    height: 0;
+    overflow: hidden;
+  }
+
+  /* ── Buttons ── */
+  .btn-row {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 32px;
+    animation: fadeIn 1.8s ease both;
+  }
+
+  .btn {
+    padding: 14px 34px;
+    border: none;
+    border-radius: 2px;
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: none;
+    transition: all .3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,.15);
+    transform: translateX(-100%);
+    transition: transform .35s ease;
+  }
+  .btn:hover::after { transform: translateX(0); }
+
+  .btn-primary {
+    background: var(--rose);
+    color: white;
+    box-shadow: 0 6px 22px rgba(200,68,90,.35);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(200,68,90,.45); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--rose);
+    border: 1.5px solid var(--rose);
+  }
+  .btn-secondary:hover { background: var(--blush); transform: translateY(-2px); }
+
+  /* ── Gallery ── */
+  .gallery-section {
+    width: min(920px, 92%);
+    margin-top: 50px;
+    animation: fadeIn 2s ease both;
+  }
+
+  .section-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  @media (max-width: 640px) { .gallery { grid-template-columns: repeat(2,1fr); } }
+
+  .memory {
+    aspect-ratio: 3/4;
+    border-radius: 3px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0,0,0,.12);
+    opacity: 0;
+    transform: translateY(24px) scale(.97);
+    transition: opacity .8s ease, transform .8s ease, box-shadow .3s ease;
+    position: relative;
+  }
+  .memory.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  .memory:hover {
+    box-shadow: 0 14px 36px rgba(200,68,90,.25);
+    transform: translateY(-5px) scale(1.02);
+    z-index: 2;
+  }
+  .memory img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .5s ease;
+  }
+  .memory:hover img { transform: scale(1.07); }
+
+  /* ── Music ── */
+  .music-section {
+    width: min(560px, 90%);
+    margin-top: 44px;
+    animation: fadeIn 2.2s ease both;
+  }
+
+  .music-section iframe {
+    border-radius: 14px;
+    box-shadow: 0 8px 28px rgba(200,68,90,.18);
+    width: 100%;
+    display: block;
+  }
+
+  /* ── Gift modal ── */
+  #giftOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(42,26,31,.6);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .5s ease;
+  }
+  #giftOverlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .gift-box {
+    background: white;
+    border-radius: 4px;
+    padding: 54px 60px;
+    text-align: center;
+    max-width: 480px;
+    width: 90%;
+    box-shadow: 0 30px 80px rgba(0,0,0,.25);
+    transform: scale(.88);
+    transition: transform .5s cubic-bezier(.34,1.56,.64,1);
+    position: relative;
+  }
+  #giftOverlay.open .gift-box {
+    transform: scale(1);
+  }
+
+  .gift-icon {
+    font-size: 64px;
+    display: block;
+    margin-bottom: 18px;
+    animation: wobble 2s ease infinite;
+  }
+  @keyframes wobble {
+    0%,100% { transform: rotate(-3deg) scale(1); }
+    50%      { transform: rotate(3deg) scale(1.05); }
+  }
+
+  .gift-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px;
+    color: var(--rose);
+    margin-bottom: 14px;
+  }
+  .gift-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-style: italic;
+    color: var(--soft);
+    line-height: 1.75;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 16px; right: 20px;
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: var(--soft);
+    cursor: none;
+    line-height: 1;
+    transition: color .2s;
+  }
+  .close-btn:hover { color: var(--rose); }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 60px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--soft);
+    opacity: .6;
+    animation: fadeIn 2.4s ease both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Burst hearts on letter open ── */
+  .burst {
+    position: fixed;
+    font-size: 20px;
+    pointer-events: none;
+    z-index: 9990;
+    animation: burstAnim 1.2s forwards;
+  }
+  @keyframes burstAnim {
+    0%   { opacity: 1; transform: translate(0,0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(.4); }
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+
+<!-- Gift overlay -->
+<div id="giftOverlay" onclick="closeGift(event)">
+  <div class="gift-box">
+    <button class="close-btn" onclick="closeOverlay()">✕</button>
+    <span class="gift-icon">🎁</span>
+    <p class="gift-heading">Your Gift</p>
+    <p class="gift-text">My gift to you is every sunrise we'll watch together, every laugh we haven't laughed yet, and every quiet moment that feels like home. I give you all my tomorrows — they're yours. ❤️</p>
+  </div>
+</div>
+
+<div id="page">
+
+  <p class="ornament">✦ &nbsp;&nbsp; ✦ &nbsp;&nbsp; ✦</p>
+
+  <h1 class="title">Happy <em>Birthday</em></h1>
+  <p class="subtitle">To the one who fills every day with light</p>
+
+  <div class="divider"><span>❤</span></div>
+
+  <!-- Letter -->
+  <div class="letter-wrap">
+    <div class="letter-card">
+      <div class="letter-preview" id="letterPreview">
+        <p class="letter-text">
+          <span class="drop-cap">H</span>appy Birthday, my love. You make my life brighter every single day.
+          Every moment with you feels like something I want to hold onto forever…
+        </p>
+      </div>
+      <div class="letter-body" id="letterBody">
+        <p class="letter-text">
+          <span class="drop-cap">H</span>appy Birthday, babycakes. You make my life brighter every single day
+          the way you smile, the way you laugh, the way you exist so effortlessly beautifully.
+          Every moment with you feels like something I want to hold onto forever.
+          <br><br>
+          I'm grateful for every memory we've made, every inside joke, every late night, every adventure.
+          I'm grateful for the ordinary hangouts and the extraordinary ones alike.
+          You've turned the smallest moments into ones I treasure.
+          <br><br>
+          Today I hope you feel exactly how much you are loved, not just by me, but by everyone
+          whose life you've touched. You deserve all the joy the world can give.
+          <br><br>
+          I love you more than any letter could say. ❤️
+          <br><br>
+          <em>— Always yours</em>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Buttons -->
+  <div class="btn-row">
+    <button class="btn btn-primary" id="letterBtn" onclick="openLetter()">Open My Letter &nbsp;💌</button>
+    <button class="btn btn-secondary" onclick="openGift()">Open Your Gift &nbsp;🎁</button>
+  </div>
+
+  <!-- Gallery -->
+  <div class="gallery-section">
+    <p class="section-label">Memories</p>
+    <div class="gallery" id="gallery">
+      <!-- Replace src with your actual photo paths -->
+      <div class="memory"><img src="thea1.jpg" alt="Memory 1" onerror="this.parentElement.style.background='linear-gradient(135deg,#f7cfd6,#fbc2eb)'"></div>
+      <div class="memory"><img src="thea2.jpg" alt="Memory 2" onerror="this.parentElement.style.background='linear-gradient(135deg,#fbc2eb,#f7cfd6)'"></div>
+      <div class="memory"><img src="thea3.jpg" alt="Memory 3" onerror="this.parentElement.style.background='linear-gradient(135deg,#fad0c4,#f7cfd6)'"></div>
+      <div class="memory"><img src="thea4.jpg" alt="Memory 4" onerror="this.parentElement.style.background='linear-gradient(135deg,#f7cfd6,#fad0c4)'"></div>
+    </div>
+  </div>
+
+  <!-- Spotify -->
+  <div class="music-section">
+    <p class="section-label" style="margin-top:0; margin-bottom:16px;">Our Song</p>
+    <iframe
+      src="https://open.spotify.com/embed/track/3iBgrkexCzVuPy4O9vx7Mf?utm_source=generator&theme=0"
+      height="152"
+      frameborder="0"
+      allowfullscreen
+      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+      loading="lazy">
+    </iframe>
+  </div>
+
+  <p class="footer">Made with love &nbsp;❤️</p>
+</div>
+
+<script>
+  /* ── Cursor ── */
+  const cur = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cur.style.left = e.clientX + 'px';
+    cur.style.top  = e.clientY + 'px';
+    spawnTrail(e.clientX, e.clientY);
+  });
+
+  let trailThrottle = 0;
+  function spawnTrail(x, y) {
+    if (Date.now() - trailThrottle < 80) return;
+    trailThrottle = Date.now();
+    const t = document.createElement('div');
+    t.className = 'trail';
+    t.textContent = '❤';
+    t.style.cssText = `left:${x}px;top:${y}px;color:var(--rose);`;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 900);
+  }
+
+  /* ── Floating petals ── */
+  const symbols = ['🌸','❤️','✿','♥','🌹'];
+  function spawnPetal() {
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.fontSize = (Math.random() * 16 + 10) + 'px';
+    const dur = (Math.random() * 8 + 7);
+    p.style.animationDuration = dur + 's';
+    p.style.animationDelay = (Math.random() * -dur) + 's';
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), (dur + 1) * 1000);
+  }
+  for (let i = 0; i < 14; i++) spawnPetal();
+  setInterval(spawnPetal, 1400);
+
+  /* ── Letter ── */
+  let letterOpen = false;
+  function openLetter() {
+    if (letterOpen) return;
+    letterOpen = true;
+
+    const btn = document.getElementById('letterBtn');
+    btn.disabled = true;
+    btn.textContent = 'With love ❤️';
+    btn.style.opacity = '.7';
+
+    document.getElementById('letterPreview').classList.add('hide');
+    setTimeout(() => {
+      document.getElementById('letterBody').classList.add('open');
+    }, 300);
+
+    // show gallery after reading
+    setTimeout(() => {
+      document.querySelectorAll('.memory').forEach((el, i) => {
+        setTimeout(() => el.classList.add('show'), i * 250);
+      });
+    }, 1400);
+
+    // heart burst
+    burstHearts();
+  }
+
+  function burstHearts() {
+    const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+    for (let i = 0; i < 18; i++) {
+      const b = document.createElement('div');
+      b.className = 'burst';
+      b.textContent = '❤';
+      b.style.color = `hsl(${Math.random()*30 + 340},80%,60%)`;
+      b.style.left = cx + 'px';
+      b.style.top  = cy + 'px';
+      const angle = (i / 18) * 360;
+      const dist  = 80 + Math.random() * 140;
+      b.style.setProperty('--tx', Math.cos(angle * Math.PI/180) * dist + 'px');
+      b.style.setProperty('--ty', Math.sin(angle * Math.PI/180) * dist + 'px');
+      b.style.animationDelay = (Math.random() * .3) + 's';
+      document.body.appendChild(b);
+      setTimeout(() => b.remove(), 1500);
+    }
+  }
+
+  /* ── Gift ── */
+  function openGift() {
+    document.getElementById('giftOverlay').classList.add('open');
+    burstHearts();
+  }
+  function closeGift(e) {
+    if (e.target === document.getElementById('giftOverlay')) closeOverlay();
+  }
+  function closeOverlay() {
+    document.getElementById('giftOverlay').classList.remove('open');
+  }
+</script>
+</body>
+</html>
